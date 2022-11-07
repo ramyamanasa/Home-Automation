@@ -1,0 +1,77 @@
+#include <Adafruit_LiquidCrystal.h>
+
+Adafruit_LiquidCrystal lcd(12,11,5,4,3,2);
+float temp;
+int tempin = A1;
+int sensorValue = 0;
+#define fan 9
+
+void setup() {
+  
+  //LIGHT
+  //Photoresistor connection
+  pinMode(A0, INPUT);
+  Serial.begin(9600);
+  //Multimeter connection
+  pinMode(10,OUTPUT);
+  //LED connection
+  pinMode(8, OUTPUT);
+  
+  
+//FAN  
+//fan connection
+pinMode (fan,OUTPUT);
+// Setting LCD’s number of rows and columns and rows:
+lcd.begin(16,2);
+delay(2000);
+}
+
+
+void loop() {
+  //LIGHT
+ sensorValue = analogRead(A0);
+  Serial.println(sensorValue);
+  analogWrite(10, map(sensorValue,0,1023,0,255));
+  delay(1000);
+  
+  if(sensorValue <400) {
+    	digitalWrite(8, HIGH);
+    	delay(sensorValue);
+ }
+  else {
+    	digitalWrite(8, LOW);
+    	delay(sensorValue); 
+  }
+  
+  
+  //FAN
+	lcd.setCursor(3,0);
+	lcd.print("Checking");
+	lcd.setCursor(2,1);
+	lcd.print("Temperature");
+	delay(3000);
+	lcd.clear();
+	lcd.setCursor(2, 0);
+	temp = analogRead(tempin);
+	temp= temp * 0.48828125;   //Converting  Temperature
+	lcd.setCursor(0,0);
+	lcd.print("TEMPERATURE=");
+	lcd.setCursor(7,1);
+	lcd.print(temp);          //Printing  Temp
+	delay(3000);
+	lcd.clear();
+  
+	if (temp <35) {
+			analogWrite(9,0);
+			lcd.print("Fan Off");
+			delay(2000);
+			lcd.clear();
+     }
+	else if (temp>=40) {
+			analogWrite(fan,255);
+			lcd.print("Fan on");
+			delay(2000);
+			lcd.clear();
+	}
+ 
+}
